@@ -1,0 +1,13 @@
+{
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://api.z.ai/api/anthropic",
+    "ANTHROPIC_AUTH_TOKEN": "f99bb6436ce84eafa03219d5cee2e915.N7ZgGP5WgI56HAVU",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "GLM-4.6",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "GLM-4.6",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "GLM-4.5-Air",
+    "ENABLE_THINKING": "true",
+    "ENABLE_STREAMING": "true",
+    "ANTHROPIC_SAFE_MODE": "false",
+    "API_TIMEOUT_MS": "3000000"
+  }
+}
