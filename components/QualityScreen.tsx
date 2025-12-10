@@ -457,7 +457,7 @@ const Slide2: React.FC<Slide2Props> = ({ isActive, step }) => {
                 {key}
               </span>
               <img
-                src={`/images/local-${key}.svg`}
+                src={getAssetUrl(`/images/local-${key}.svg`)}
                 alt={`Location ${key}`}
                 className=""
                 style={{
@@ -561,12 +561,12 @@ interface Slide4Props {
 const Slide4: React.FC<Slide4Props> = ({ isActive }) => {
   const [currentImage, setCurrentImage] = React.useState(0);
   const images = [
-    '/images/display0.png',
-    '/images/display1.png',
-    '/images/display2.png',
-    '/images/display3.png',
-    '/images/display4.png',
-    '/images/display5.png',
+    getAssetUrl('/images/display0.png'),
+    getAssetUrl('/images/display1.png'),
+    getAssetUrl('/images/display2.png'),
+    getAssetUrl('/images/display3.png'),
+    getAssetUrl('/images/display4.png'),
+    getAssetUrl('/images/display5.png'),
   ];
 
   React.useEffect(() => {
