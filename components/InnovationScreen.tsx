@@ -35,7 +35,13 @@ const InnovationScreen: React.FC<InnovationScreenProps> = ({ setPage, registerNe
   }, [currentSlide]);
 
   // Slide navigation functions
-  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % 4);
+  const nextSlide = () => {
+    if (currentSlide >= 3) {
+      setPage(Page.Home);
+    } else {
+      setCurrentSlide((prev) => prev + 1);
+    }
+  };
   const prevSlide = () => {
     if (currentSlide > 0) {
       setCurrentSlide((prev) => prev - 1);
@@ -44,9 +50,17 @@ const InnovationScreen: React.FC<InnovationScreenProps> = ({ setPage, registerNe
 
   // Register next action handler
   useEffect(() => {
-    registerNextAction(() => setCurrentSlide((prev) => (prev + 1) % 4));
+    const handleNext = () => {
+      if (currentSlideRef.current >= 3) {
+        // Last slide - go to home
+        setPage(Page.Home);
+      } else {
+        setCurrentSlide((prev) => prev + 1);
+      }
+    };
+    registerNextAction(handleNext);
     return () => registerNextAction(null);
-  }, [registerNextAction]);
+  }, [registerNextAction, setPage]);
 
   // Register prev action handler
   useEffect(() => {
