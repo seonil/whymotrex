@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Page } from '../types';
+import { getAssetUrl } from '../utils';
 
 interface HomeScreenProps {
   setPage: (page: Page) => void;
@@ -12,17 +13,17 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ setPage, registerNextAction, re
     {
       title: 'Innovation Driven by Technology Leadership',
       page: Page.Innovation,
-      bgImage: '/images/bg-1-1.png'
+      bgImage: getAssetUrl('/images/bg-1-1.png')
     },
     {
       title: 'Quality Excellence & Manufacturing Reliability',
       page: Page.Quality,
-      bgImage: '/images/bg-2-1.png'
+      bgImage: getAssetUrl('/images/bg-2-1.png')
     },
     {
       title: 'Unified Strength for Future Mobility',
       page: Page.UnifiedStrength,
-      bgImage: '/images/bg-3-1.png'
+      bgImage: getAssetUrl('/images/bg-3-1.png')
     },
   ];
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Page } from '../types';
+import { getAssetUrl } from '../utils';
 
 interface UnifiedStrengthScreenProps {
   setPage: (page: Page) => void;
@@ -135,7 +136,7 @@ const Slide0_Intro = () => {
       <div
         className="absolute inset-0 z-0"
         style={{
-          backgroundImage: 'url(/images/bg-3-1.png)',
+          backgroundImage: `url(${getAssetUrl('/images/bg-3-1.png')})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -145,12 +146,12 @@ const Slide0_Intro = () => {
       <div className="absolute inset-0 z-1 flex opacity-60 mix-blend-color-dodge">
         <div className="flex w-[200%] h-full animate-mesh-slide">
           <img
-            src="/images/mesh.svg"
+            src={getAssetUrl('/images/mesh.svg')}
             alt=""
             className="w-1/2 h-full object-cover"
           />
           <img
-            src="/images/mesh.svg"
+            src={getAssetUrl('/images/mesh.svg')}
             alt=""
             className="w-1/2 h-full object-cover"
           />
@@ -243,7 +244,7 @@ const Slide1_Affiliates: React.FC<Slide1_AffiliatesProps> = ({ isActive }) => {
     <div
       className="relative w-[1920px] h-full flex-shrink-0"
       style={{
-        backgroundImage: 'url(/images/bg-Connected2.png)',
+        backgroundImage: `url(${getAssetUrl('/images/bg-Connected2.png')})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }}
@@ -307,34 +308,34 @@ const Slide1_Affiliates: React.FC<Slide1_AffiliatesProps> = ({ isActive }) => {
         }
       `}</style>
       <div className="absolute top-[600px] left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[1200px] flex items-center justify-center pointer-events-none z-0">
-        <img src="/images/hex_centered.svg" alt="" className={`w-[900px] ${isActive ? 'animate-hex-ripple' : 'opacity-0'}`} style={{ animationDelay: '5000ms' }} />
-        <img src="/images/hex_centered.svg" alt="" className={`w-[900px] ${isActive ? 'animate-hex-ripple' : 'opacity-0'}`} style={{ animationDelay: '6600ms' }} />
-        <img src="/images/hex_centered.svg" alt="" className={`w-[900px] ${isActive ? 'animate-hex-ripple' : 'opacity-0'}`} style={{ animationDelay: '8200ms' }} />
+        <img src={getAssetUrl('/images/hex_centered.svg')} alt="" className={`w-[900px] ${isActive ? 'animate-hex-ripple' : 'opacity-0'}`} style={{ animationDelay: '5000ms' }} />
+        <img src={getAssetUrl('/images/hex_centered.svg')} alt="" className={`w-[900px] ${isActive ? 'animate-hex-ripple' : 'opacity-0'}`} style={{ animationDelay: '6600ms' }} />
+        <img src={getAssetUrl('/images/hex_centered.svg')} alt="" className={`w-[900px] ${isActive ? 'animate-hex-ripple' : 'opacity-0'}`} style={{ animationDelay: '8200ms' }} />
       </div>
 
       {/* Center Logo */}
       <div className="absolute top-[600px] left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 w-[242px]">
-        <img src="/images/motrex-logo-blue.svg" alt="Motrex Logo" className="w-full drop-shadow-lg" />
+        <img src={getAssetUrl('/images/motrex-logo-blue.svg')} alt="Motrex Logo" className="w-full drop-shadow-lg" />
       </div>
 
       {/* Card 1 */}
       <div className="absolute top-[325px] left-[80px]" style={getWrapperStyle(500, 'left')}>
-        <img src="/images/aff1.svg" alt="Affiliate 1" className="w-[871px] h-[301px] hover:scale-105 transition-transform duration-600 drop-shadow-xl" />
+        <img src={getAssetUrl('/images/aff1.svg')} alt="Affiliate 1" className="w-[871px] h-[301px] hover:scale-105 transition-transform duration-600 drop-shadow-xl" />
       </div>
 
       {/* Card 2 */}
       <div className="absolute top-[325px] left-[969px]" style={getWrapperStyle(1500, 'right')}>
-        <img src="/images/aff2.svg" alt="Affiliate 2" className="w-[871px] h-[301px] hover:scale-105 transition-transform duration-600 drop-shadow-xl" />
+        <img src={getAssetUrl('/images/aff2.svg')} alt="Affiliate 2" className="w-[871px] h-[301px] hover:scale-105 transition-transform duration-600 drop-shadow-xl" />
       </div>
 
       {/* Card 3 */}
       <div className="absolute bottom-[150px] left-[80px]" style={getWrapperStyle(2500, 'left')}>
-        <img src="/images/aff3.svg" alt="Affiliate 3" className="w-[871px] h-[301px] hover:scale-105 transition-transform duration-600 drop-shadow-xl" />
+        <img src={getAssetUrl('/images/aff3.svg')} alt="Affiliate 3" className="w-[871px] h-[301px] hover:scale-105 transition-transform duration-600 drop-shadow-xl" />
       </div>
 
       {/* Card 4 */}
       <div className="absolute bottom-[150px] left-[969px]" style={getWrapperStyle(3500, 'right')}>
-        <img src="/images/aff4.svg" alt="Affiliate 4" className="w-[871px] h-[301px] hover:scale-105 transition-transform duration-600 drop-shadow-xl" />
+        <img src={getAssetUrl('/images/aff4.svg')} alt="Affiliate 4" className="w-[871px] h-[301px] hover:scale-105 transition-transform duration-600 drop-shadow-xl" />
       </div>
 
     </div>

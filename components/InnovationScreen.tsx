@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Page } from '../types';
+import { getAssetUrl } from '../utils';
 
 interface InnovationScreenProps {
   setPage: (page: Page) => void;
@@ -135,7 +136,7 @@ const Slide0_Intro = () => {
       <div
         className="absolute inset-0 z-0"
         style={{
-          backgroundImage: 'url(/images/bg-1-1.png)',
+          backgroundImage: `url(${getAssetUrl('/images/bg-1-1.png')})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -145,12 +146,12 @@ const Slide0_Intro = () => {
       <div className="absolute inset-0 z-1 flex opacity-60 mix-blend-color-dodge">
         <div className="flex w-[200%] h-full animate-mesh-slide">
           <img
-            src="/images/mesh.svg"
+            src={getAssetUrl('/images/mesh.svg')}
             alt=""
             className="w-1/2 h-full object-cover"
           />
           <img
-            src="/images/mesh.svg"
+            src={getAssetUrl('/images/mesh.svg')}
             alt=""
             className="w-1/2 h-full object-cover"
           />
@@ -242,7 +243,7 @@ const Slide1_RnD: React.FC<Slide1_RnDProps> = ({ isActive }) => {
     <div
       className="relative w-[1920px] h-full flex-shrink-0 box-border overflow-hidden"
       style={{
-        backgroundImage: 'url(/images/bg-Connected.png)',
+        backgroundImage: `url(${getAssetUrl('/images/bg-Connected.png')})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center'
       }}
@@ -655,7 +656,7 @@ const Slide2_CoreTech: React.FC<Slide2_CoreTechProps> = ({ isActive }) => {
     <div
       className="relative w-[1920px] h-full flex-shrink-0"
       style={{
-        backgroundImage: 'url(/images/bg-Connected2.png)',
+        backgroundImage: `url(${getAssetUrl('/images/bg-Connected2.png')})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }}
@@ -730,14 +731,14 @@ const Slide2_CoreTech: React.FC<Slide2_CoreTechProps> = ({ isActive }) => {
         }
       `}</style>
       <div className="hex-ripple-container z-0">
-        <img src="/images/hex_centered.svg" alt="" className={`animate-hex-ripple ${isActive ? 'active' : ''}`} style={{ animationDelay: isActive ? '3s' : '0s' }} />
-        <img src="/images/hex_centered.svg" alt="" className={`animate-hex-ripple ${isActive ? 'active' : ''}`} style={{ animationDelay: isActive ? '5s' : '0s' }} />
-        <img src="/images/hex_centered.svg" alt="" className={`animate-hex-ripple ${isActive ? 'active' : ''}`} style={{ animationDelay: isActive ? '7s' : '0s' }} />
+        <img src={getAssetUrl('/images/hex_centered.svg')} alt="" className={`animate-hex-ripple ${isActive ? 'active' : ''}`} style={{ animationDelay: isActive ? '3s' : '0s' }} />
+        <img src={getAssetUrl('/images/hex_centered.svg')} alt="" className={`animate-hex-ripple ${isActive ? 'active' : ''}`} style={{ animationDelay: isActive ? '5s' : '0s' }} />
+        <img src={getAssetUrl('/images/hex_centered.svg')} alt="" className={`animate-hex-ripple ${isActive ? 'active' : ''}`} style={{ animationDelay: isActive ? '7s' : '0s' }} />
       </div>
 
       {/* Center Logo */}
       <div className="absolute top-[600px] left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 w-[242px]">
-        <img src="/images/motrex-logo-blue.svg" alt="Motrex Logo" className="w-full drop-shadow-lg" />
+        <img src={getAssetUrl('/images/motrex-logo-blue.svg')} alt="Motrex Logo" className="w-full drop-shadow-lg" />
       </div>
 
       {/* Card 1 - SW Technology (Top Left) */}
@@ -752,7 +753,7 @@ const Slide2_CoreTech: React.FC<Slide2_CoreTechProps> = ({ isActive }) => {
               </span>
             </li>
             <li className="flex justify-center py-4">
-              <img src="/images/core1.svg" alt="Core Technology" className="w-[638px]" />
+              <img src={getAssetUrl('/images/core1.svg')} alt="Core Technology" className="w-[638px]" />
             </li>
             <li className="flex items-start gap-3">
               <span className={bulletStyle} />
@@ -782,7 +783,7 @@ const Slide2_CoreTech: React.FC<Slide2_CoreTechProps> = ({ isActive }) => {
               </span>
             </li>
             <li className="flex justify-center py-4">
-              <img src="/images/core2.svg" alt="Core Technology 2" className="w-[638px]" />
+              <img src={getAssetUrl('/images/core2.svg')} alt="Core Technology 2" className="w-[638px]" />
             </li>
           </ul>
         </div>
@@ -811,7 +812,7 @@ const Slide2_CoreTech: React.FC<Slide2_CoreTechProps> = ({ isActive }) => {
               </div>
             </li>
             <li className="flex justify-center py-4">
-              <img src="/images/core3.svg" alt="Core Technology 3" className="w-[638px]" />
+              <img src={getAssetUrl('/images/core3.svg')} alt="Core Technology 3" className="w-[638px]" />
             </li>
           </ul>
         </div>
@@ -926,7 +927,7 @@ const Slide3_HMI: React.FC<Slide3_HMIProps> = ({ isActive }) => {
       <div className="flex-1 flex items-center w-full">
         {/* Image Left (No margin left) */}
         <div className={`flex-shrink-0 ${getAnimStyle('delay-[300ms]', 'slideLeft')}`}>
-          <img src="/images/hmi.png" alt="HMI Display" className="block w-[940px] mt-[100px]" />
+          <img src={getAssetUrl('/images/hmi.png')} alt="HMI Display" className="block w-[940px] mt-[100px]" />
         </div>
         {/* Text Right */}
         <div className={`flex-1 pl-20 pr-24 flex flex-col items-start text-left ${getAnimStyle('delay-[500ms]', 'slideUp')}`}>
@@ -952,7 +953,7 @@ const Slide3_HMI: React.FC<Slide3_HMIProps> = ({ isActive }) => {
         </div>
         {/* Image Right (No margin right) */}
         <div className={`flex-shrink-0 ${getAnimStyle('delay-[900ms]', 'slideRight')}`}>
-          <img src="/images/rse.png" alt="Rear Seat Entertainment" className="block w-[1076px]" />
+          <img src={getAssetUrl('/images/rse.png')} alt="Rear Seat Entertainment" className="block w-[1076px]" />
         </div>
       </div>
     </div>
