@@ -3,6 +3,7 @@ import HomeScreen from './components/HomeScreen';
 import InnovationScreen from './components/InnovationScreen';
 import QualityScreen from './components/QualityScreen';
 import UnifiedStrengthScreen from './components/UnifiedStrengthScreen';
+import MouseTracker from './components/MouseTracker';
 import { Page } from './types';
 
 const STORAGE_KEY = 'whymotrex-current-page';
@@ -67,41 +68,55 @@ function App() {
       }
     };
 
-    // Keyboard events: Enter, ArrowRight, ArrowDown, Space (next), ArrowLeft, ArrowUp (prev)
+    // Next action: Click, ArrowRight, ScrollDown, Enter, Space
+    // Prev action: ArrowLeft, Backspace
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Enter' || e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+      if (e.key === 'Enter' || e.key === 'ArrowRight' || e.key === ' ') {
         e.preventDefault();
         triggerNextAction();
-      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      } else if (e.key === 'ArrowLeft' || e.key === 'Backspace') {
         e.preventDefault();
         triggerPrevAction();
       }
     };
 
+    // Mouse click - next action (ignore clicks on buttons/interactive elements)
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (
+        target.tagName === 'BUTTON' ||
+        target.closest('button') ||
+        target.classList.contains('cursor-pointer') ||
+        target.closest('.cursor-pointer')
+      ) {
+        return;
+      }
+      triggerNextAction();
+    };
 
-
-    // Mouse wheel scroll down (next), scroll up (prev)
+    // Mouse wheel scroll down (next)
     const handleWheel = (e: WheelEvent) => {
       if (e.deltaY > 0) {
         e.preventDefault();
         triggerNextAction();
-      } else if (e.deltaY < 0) {
-        e.preventDefault();
-        triggerPrevAction();
       }
+      // Scroll up does nothing (prev is only ArrowLeft/Backspace)
     };
 
     window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('click', handleClick);
     window.addEventListener('wheel', handleWheel, { passive: false });
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('click', handleClick);
       window.removeEventListener('wheel', handleWheel);
     };
   }, []);
 
   return (
     <div className="app-container">
+      <MouseTracker />
       <div className="content-wrapper">
         <div className="canvas" style={{ transform: `scale(${scale})` }}>
           {page === Page.Home && <HomeScreen setPage={setPage} registerNextAction={registerNextAction} registerPrevAction={registerPrevAction} />}

@@ -29,7 +29,7 @@ const BlankScreen: React.FC<BlankScreenProps> = ({ setPage, title }) => {
           onClick={() => setPage(Page.Home)}
           className="flex items-center gap-3 text-gray-700 hover:text-gray-900 transition-colors"
           style={{
-            fontFamily: 'Albert Sans',
+            fontFamily: '"42dot Sans"',
             fontSize: '20px',
             fontWeight: 500,
           }}
@@ -52,7 +52,7 @@ const BlankScreen: React.FC<BlankScreenProps> = ({ setPage, title }) => {
         <h1
           className="text-gray-900 font-semibold"
           style={{
-            fontFamily: 'Albert Sans',
+            fontFamily: '"42dot Sans"',
             fontSize: '32px',
             fontWeight: 600,
           }}
@@ -79,7 +79,7 @@ const BlankScreen: React.FC<BlankScreenProps> = ({ setPage, title }) => {
         <p
           className="text-gray-400"
           style={{
-            fontFamily: 'Albert Sans',
+            fontFamily: '"42dot Sans"',
             fontSize: '24px',
             fontWeight: 300,
           }}

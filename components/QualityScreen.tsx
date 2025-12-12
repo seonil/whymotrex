@@ -2,6 +2,95 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Page } from '../types';
 import { getAssetUrl } from '../utils';
 
+// Speech Bubble Component
+interface SpeechBubbleProps {
+  x: number;
+  y: number;
+  lineStartX: number;
+  lineStartY: number;
+  lineEndX: number;
+  lineEndY: number;
+  visible: boolean;
+  text: string;
+  width?: number;
+}
+
+const SpeechBubble: React.FC<SpeechBubbleProps> = ({ x, y, lineStartX, lineStartY, lineEndX, lineEndY, visible, text, width = 500 }) => {
+  // Calculate SVG bounds
+  const svgLeft = Math.min(lineStartX, lineEndX);
+  const svgTop = Math.min(lineStartY, lineEndY);
+  const svgWidth = Math.abs(lineEndX - lineStartX) + 10;
+  const svgHeight = Math.abs(lineEndY - lineStartY) + 10;
+
+  return (
+    <div
+      className="transition-all duration-700 ease-out"
+      style={{
+        opacity: visible ? 1 : 0,
+        transform: visible ? 'translateY(0)' : 'translateY(20px)',
+        pointerEvents: 'none',
+      }}
+    >
+      {/* Speech Bubble */}
+      <div
+        style={{
+          position: 'absolute',
+          left: `${x}px`,
+          top: `${y}px`,
+          zIndex: 60,
+          borderRadius: '24px',
+          border: '4px solid #0078FF',
+          background: 'rgba(255, 255, 255, 0.60)',
+          boxShadow: '8px 16px 20px 0 rgba(0, 0, 0, 0.15)',
+          backdropFilter: 'blur(15px)',
+          display: 'flex',
+          width: `${width}px`,
+          padding: '20px 32px',
+          justifyContent: 'center',
+          alignItems: 'center',
+          gap: '10px',
+        }}
+      >
+        <p
+          style={{
+            color: '#0078FF',
+            fontFamily: '"42dot Sans"',
+            fontSize: '28px',
+            fontWeight: 500,
+            lineHeight: '120%',
+            letterSpacing: '-0.64px',
+            textAlign: 'center',
+            whiteSpace: 'pre-line',
+          }}
+        >
+          {text}
+        </p>
+      </div>
+
+      {/* Connector Line SVG */}
+      <svg
+        style={{
+          position: 'absolute',
+          left: `${svgLeft}px`,
+          top: `${svgTop}px`,
+          zIndex: 59,
+          pointerEvents: 'none',
+          overflow: 'visible',
+        }}
+        width={svgWidth}
+        height={svgHeight}
+      >
+        <path
+          d={`M${lineStartX - svgLeft},${lineStartY - svgTop} L${lineEndX - svgLeft},${lineEndY - svgTop}`}
+          stroke="#0078FF"
+          strokeWidth="4"
+          fill="none"
+        />
+      </svg>
+    </div>
+  );
+};
+
 interface QualityScreenProps {
   setPage: (page: Page) => void;
   registerNextAction: (handler: (() => void) | null) => void;
@@ -23,47 +112,19 @@ const QualityScreen: React.FC<QualityScreenProps> = ({ setPage, registerNextActi
     return 0;
   });
 
-  // Keep ref to curre  const videoRef2 = useRef<HTMLVideoElement>(null);
+  // For fade transition when going from last slide to first
+  const [isFading, setIsFading] = useState(false);
+
+  // Keep ref to current slide for use in handlers
   const currentSlideRef = useRef(currentSlide);
 
   // Slide 2 inner step state
   const [slide2Step, setSlide2Step] = useState(0);
 
+  // Removed automatic step progression for Slide 2 (Manual only)
   useEffect(() => {
     currentSlideRef.current = currentSlide;
   }, [currentSlide]);
-
-  // Automatic step progression for Slide 2
-  useEffect(() => {
-    if (currentSlide !== 1) return;
-
-    let timer: NodeJS.Timeout;
-
-    if (slide2Step === 0) {
-      // Step 0: Pins appearing (slower stagger). Wait for all to appear + pause.
-      // 12 pins * 150ms = 1800ms + 1000ms initial delay = ~2800ms. Let's give it 3500ms.
-      timer = setTimeout(() => {
-        setSlide2Step(1);
-      }, 3500);
-    } else if (slide2Step === 1) {
-      // Step 1: Group 1 active. Wait 5s.
-      timer = setTimeout(() => {
-        setSlide2Step(2);
-      }, 5000);
-    } else if (slide2Step === 2) {
-      // Step 2: Group 2 active. Wait 5s.
-      timer = setTimeout(() => {
-        setSlide2Step(3);
-      }, 5000);
-    } else if (slide2Step === 3) {
-      // Step 3: All active (Half size). Wait 5s then next slide.
-      timer = setTimeout(() => {
-        nextSlide();
-      }, 5000);
-    }
-
-    return () => clearTimeout(timer);
-  }, [currentSlide, slide2Step]);
 
   const [showVideo, setShowVideo] = useState(false);
   const [showVideo2, setShowVideo2] = useState(false);
@@ -86,7 +147,12 @@ const QualityScreen: React.FC<QualityScreenProps> = ({ setPage, registerNextActi
       // Reset steps if leaving slide 2 (optional, but good for re-entry)
       if (currentSlide === 1) setSlide2Step(0);
     } else {
-      setPage(Page.Home);
+      // Last slide - fade transition to first slide
+      setIsFading(true);
+      setTimeout(() => {
+        setCurrentSlide(0);
+        setTimeout(() => setIsFading(false), 50);
+      }, 500);
     }
   };
 
@@ -151,10 +217,9 @@ const QualityScreen: React.FC<QualityScreenProps> = ({ setPage, registerNextActi
         height: '1080px',
         backgroundColor: '#F5F7FA',
       }}
-      onClick={handleSlideClick}
     >
-      {/* Navigation Controls (Floating Bottom Right) */}
-      <div className="absolute bottom-12 right-16 flex gap-6 z-50">
+      {/* Navigation Controls (Floating Bottom Right) - HIDDEN */}
+      {/* <div className="absolute bottom-12 right-16 flex gap-6 z-50">
         <button
           onClick={(e) => { e.stopPropagation(); prevSlide(); }}
           className="w-14 h-14 rounded-full bg-white shadow-xl flex items-center justify-center hover:bg-gray-50 hover:scale-105 transition-all duration-300 border border-gray-100 opacity-80 hover:opacity-100"
@@ -169,10 +234,10 @@ const QualityScreen: React.FC<QualityScreenProps> = ({ setPage, registerNextActi
         >
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6" /></svg>
         </button>
-      </div>
+      </div> */}
 
-      {/* Pagination Indicators */}
-      <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 flex gap-4 z-50">
+      {/* Pagination Indicators - HIDDEN */}
+      {/* <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 flex gap-4 z-50">
         {[0, 1, 2, 3, 4, 5].map((idx) => (
           <button
             key={idx}
@@ -182,10 +247,10 @@ const QualityScreen: React.FC<QualityScreenProps> = ({ setPage, registerNextActi
             aria-label={`Go to slide ${idx + 1}`}
           />
         ))}
-      </div>
+      </div> */}
 
-      {/* Header (Back Button) */}
-      <div className="absolute top-0 left-0 p-10 z-50">
+      {/* Home Button (Top Right) */}
+      <div className="absolute z-50" style={{ top: '30px', right: '30px' }}>
         <button
           onClick={(e) => { e.stopPropagation(); setPage(Page.Home); }}
           className="flex items-center justify-center w-14 h-14 rounded-full bg-white shadow-md hover:shadow-lg transition-all opacity-80 hover:opacity-100 group"
@@ -198,10 +263,13 @@ const QualityScreen: React.FC<QualityScreenProps> = ({ setPage, registerNextActi
         </button>
       </div>
 
-      {/* Slides Viewport */}
+      {/* Slides Viewport with fade transition */}
       <div
-        className="flex transition-transform duration-700 ease-[cubic-bezier(0.25,0.1,0.25,1.0)] h-full"
-        style={{ transform: `translateX(-${currentSlide * 1920}px)` }}
+        className={`flex h-full transition-opacity duration-500 ease-in-out ${isFading ? 'opacity-0' : 'opacity-100'}`}
+        style={{
+          transform: `translateX(-${currentSlide * 1920}px)`,
+          transition: isFading ? 'opacity 0.5s ease-in-out' : 'transform 0.7s cubic-bezier(0.25,0.1,0.25,1.0), opacity 0.5s ease-in-out'
+        }}
       >
         <Slide1 />
         <Slide2 isActive={currentSlide === 1} step={slide2Step} />
@@ -276,7 +344,7 @@ const Slide1 = () => {
         <p
           style={{
             color: '#FFF',
-            fontFamily: '"Albert Sans"',
+            fontFamily: '"42dot Sans"',
             fontSize: '40px',
             fontStyle: 'normal',
             fontWeight: 500,
@@ -291,7 +359,7 @@ const Slide1 = () => {
         <h1
           style={{
             color: '#FFF',
-            fontFamily: '"Albert Sans"',
+            fontFamily: '"42dot Sans"',
             fontSize: '92px',
             fontStyle: 'normal',
             fontWeight: 700,
@@ -318,11 +386,11 @@ const Slide2: React.FC<Slide2Props> = ({ isActive, step }) => {
   const pinPositions: { [key: string]: { left: number; bottom: number } } = {
     'pin1': { left: 222, bottom: 349 },
     'pin2': { left: 318, bottom: 270 },
-    'pin3': { left: 428, bottom: 206 },
+    'pin3': { left: 488, bottom: 186 },
     'pin4': { left: 912, bottom: 367 },
     'pin5': { left: 1108, bottom: 339 },
     'pin6': { left: 1514, bottom: 339 },
-    'pin7': { left: 503, bottom: 90 },
+   // 'pin7': { left: 503, bottom: 90 },
     'pin8': { left: 1487, bottom: 347 },
     'pin9': { left: 987, bottom: 418 },
     'pin10': { left: 826, bottom: 448 },
@@ -331,45 +399,45 @@ const Slide2: React.FC<Slide2Props> = ({ isActive, step }) => {
   };
 
   const GROUP_1 = ['pin1', 'pin2', 'pin3', 'pin4', 'pin8'];
-  const GROUP_2 = ['pin5', 'pin6', 'pin7', 'pin9', 'pin10', 'pin11', 'pin12'];
+  const GROUP_2 = ['pin5', 'pin6', 'pin9', 'pin10', 'pin11', 'pin12'];
 
-  const getPinStyle = (key: string) => {
+  const getPinState = (key: string) => {
     const isGroup1 = GROUP_1.includes(key);
-    let scale = 0.33;
-    let grayscale = 1; // 1 = 100% grayscale
+    let imageSrc = '';
+    let isLocalPin = false;
 
+    // Step 0: Initial Entry - Blue Pins
     if (step === 0) {
-      // Entry: all scale 0.43, grayscale
-      scale = 0.43;
-      grayscale = 1;
-    } else if (step === 1) {
-      // Group 1 active: scale 1, color. Group 2 inactive.
-      if (isGroup1) {
-        scale = 1;
-        grayscale = 0;
-      } else {
-        scale = 0.43;
-        grayscale = 1;
-      }
-    } else if (step === 2) {
-      // Group 2 active: scale 1, color. Group 1 inactive.
+      imageSrc = getAssetUrl('/images/pin-blue.svg');
+      isLocalPin = false;
+    }
+    // Step 1: Group 2 Active (Navigation) - Group 2 activates first
+    else if (step === 1) {
       if (!isGroup1) {
-        scale = 1;
-        grayscale = 0;
+        imageSrc = getAssetUrl(`/images/local-${key}.svg`);
+        isLocalPin = true;
       } else {
-        scale = 0.43;
-        grayscale = 1;
+        imageSrc = getAssetUrl('/images/pin-blue-light.svg');
+        isLocalPin = false;
       }
-    } else if (step === 3) {
-      // All active: scale 0.65 (30% larger than 0.5), color.
-      scale = 0.65;
-      grayscale = 0;
+    }
+    // Step 2: Group 1 Active (Infotainment)
+    else if (step === 2) {
+      if (isGroup1) {
+        imageSrc = getAssetUrl(`/images/local-${key}.svg`);
+        isLocalPin = true;
+      } else {
+        imageSrc = getAssetUrl('/images/pin-blue-light.svg');
+        isLocalPin = false;
+      }
+    }
+    // Step 3: All Active
+    else if (step === 3) {
+      imageSrc = getAssetUrl(`/images/local-${key}.svg`);
+      isLocalPin = true;
     }
 
-    return {
-      scale,
-      grayscale,
-    };
+    return { imageSrc, isLocalPin };
   };
 
   const getAnimStyle = (delay: string) => {
@@ -431,24 +499,32 @@ const Slide2: React.FC<Slide2Props> = ({ isActive, step }) => {
       {Object.entries(pinPositions)
         .sort(([, a], [, b]) => b.bottom - a.bottom) // Render from far (high bottom) to near (low bottom)
         .map(([key, pos]) => {
-          const { scale, grayscale } = getPinStyle(key);
+          const { imageSrc, isLocalPin } = getPinState(key);
           const index = parseInt(key.replace('pin', '')) || 0;
           const entryDelay = isActive ? `${1000 + index * 150}ms` : '0ms'; // Slower appear (150ms)
 
           // Generate a pseudo-random delay based on the key
           const breatheDelay = `-${(index * 0.3) % 2}s`;
 
+          // Pin sizes: base (blue pin) = 66px, local (expanded) = 128px
+          const basePinWidth = 66;
+          const localPinWidth = 128;
+
+          // Current width based on activation state
+          const currentWidth = isLocalPin ? localPinWidth : basePinWidth;
+          // Offset to keep center-bottom fixed: (currentWidth - baseWidth) / 2
+          const leftOffset = (currentWidth - basePinWidth) / 2;
+
           return (
             <div
               key={key}
-              className="absolute transition-all duration-700 ease-out origin-bottom group cursor-pointer"
+              className="absolute group cursor-pointer"
               style={{
-                left: `${pos.left}px`,
+                left: `${pos.left - leftOffset}px`,
                 bottom: `${pos.bottom}px`,
-                transform: `scale(${scale})`,
-                filter: `grayscale(${grayscale})`,
                 zIndex: Math.round(1000 - pos.bottom),
                 opacity: isActive ? 1 : 0,
+                transition: 'left 700ms ease-out, opacity 700ms ease-out',
                 transitionDelay: step === 0 ? entryDelay : '0ms',
               }}
             >
@@ -457,17 +533,60 @@ const Slide2: React.FC<Slide2Props> = ({ isActive, step }) => {
                 {key}
               </span>
               <img
-                src={getAssetUrl(`/images/local-${key}.svg`)}
+                src={imageSrc}
                 alt={`Location ${key}`}
-                className=""
                 style={{
-                  animation: grayscale === 0 ? `breathe 3s ease-in-out infinite` : 'none',
+                  width: `${currentWidth}px`,
+                  height: 'auto',
+                  transition: 'width 700ms ease-out',
+                  animation: isLocalPin ? `breathe 3s ease-in-out infinite` : 'none',
                   animationDelay: breatheDelay,
                 }}
               />
             </div>
           );
         })}
+
+      {/* Speech Bubbles for Step 1 (Navigation/Mobility - Group 2) */}
+      {/* Pin5 Speech Bubble */}
+      <SpeechBubble
+        x={652}
+        y={784}
+        lineStartX={985}
+        lineStartY={793}
+        lineEndX={1140}
+        lineEndY={716}
+        visible={step === 1 && isActive}
+        text={`HERE Navigation is a full stack navigation software for a smarter driving experience.\nThe turnkey solution gives automakers and \nTier 1 true configurability`}
+        width={650}
+      />
+
+      {/* Pin6 Speech Bubble */}
+      <SpeechBubble
+        x={1397}
+        y={444}
+        lineStartX={1521}
+        lineStartY={550}
+        lineEndX={1521}
+        lineEndY={636}
+        visible={step === 1 && isActive}
+        text={`Digital Taxi Meter\nand Car Hailing Solution`}
+        width={450}
+      />
+
+      {/* Speech Bubbles for Step 2 (Multimedia/Streaming - Group 1) */}
+      {/* Pin1 Speech Bubble */}
+      <SpeechBubble
+        x={626}
+        y={860}
+        lineStartX={646}
+        lineStartY={880}
+        lineEndX={501}
+        lineEndY={808}
+        visible={step === 2 && isActive}
+        text="Advanced alogorithms for premiums, spatialized audio experiences"
+        width={600}
+      />
 
       {/* Count Local SVG - Appears at Step 3 */}
       <img
@@ -481,6 +600,143 @@ const Slide2: React.FC<Slide2Props> = ({ isActive, step }) => {
           zIndex: 50,
         }}
       />
+
+      {/* Group Description Overlay */}
+      <div
+        className="absolute z-40 pointer-events-none"
+        style={{
+          top: '268px',
+          left: '80px',
+        }}
+      >
+        {/* Step 1: Group 2 - Navigation/Mobility */}
+        <div
+          className="flex flex-col transition-all duration-700"
+          style={{
+            width: '608px',
+            opacity: step === 1 && isActive ? 1 : 0,
+            transform: step === 1 && isActive ? 'translateY(0)' : 'translateY(20px)',
+          }}
+        >
+          {/* 1번 - Badge */}
+          <span
+            style={{
+              color: '#005FF9',
+              textAlign: 'center',
+              fontFamily: '"Albert Sans"',
+              fontSize: '28px',
+              fontWeight: 500,
+              borderRadius: '62px',
+              border: '3px solid #005FF9',
+              backdropFilter: 'blur(15px)',
+              padding: '8px 24px',
+              display: 'inline-block',
+              width: 'fit-content',
+              marginBottom: '4px',
+            }}
+          >
+            Navigation/Mobility
+          </span>
+          {/* 2번 - Title */}
+          <h2
+            style={{
+              color: '#005FF9',
+              textAlign: 'left',
+              fontFamily: '"Albert Sans"',
+              fontSize: '60px',
+              fontWeight: 800,
+              lineHeight: '120%',
+              letterSpacing: '-1.2px',
+              marginBottom: '4px',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            Smart Mobility Solutions
+          </h2>
+          {/* 3번 - Description */}
+          <p
+            style={{
+              color: '#005FF9',
+              fontFamily: '"Albert Sans"',
+              fontSize: '24px',
+              fontWeight: 500,
+              lineHeight: 'normal',
+            }}
+          >
+            Advanced navigation and region-specific<br />connectivity for the future of autonomous driving.
+          </p>
+        </div>
+
+        {/* Step 2: Group 1 - Multimedia/Streaming */}
+        <div
+          className="absolute top-0 left-0 flex flex-col transition-all duration-700"
+          style={{
+            width: '608px',
+            opacity: step === 2 && isActive ? 1 : 0,
+            transform: step === 2 && isActive ? 'translateY(0)' : 'translateY(20px)',
+          }}
+        >
+          {/* 1번 - Badge */}
+          <span
+            style={{
+              color: '#005FF9',
+              textAlign: 'center',
+              fontFamily: '"Albert Sans"',
+              fontSize: '28px',
+              fontWeight: 500,
+              borderRadius: '62px',
+              border: '3px solid #005FF9',
+              backdropFilter: 'blur(15px)',
+              padding: '8px 24px',
+              display: 'inline-block',
+              width: 'fit-content',
+              marginBottom: '4px',
+            }}
+          >
+            Multimedia/Streaming
+          </span>
+          {/* 2번 - Title */}
+          <h2
+            style={{
+              color: '#005FF9',
+              textAlign: 'left',
+              fontFamily: '"Albert Sans"',
+              fontSize: '60px',
+              fontWeight: 800,
+              lineHeight: '120%',
+              letterSpacing: '-1.2px',
+              marginBottom: '4px',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            Global Infotainment Hub
+          </h2>
+          {/* 3번 - Description */}
+          <p
+            style={{
+              color: '#005FF9',
+              fontFamily: '"Albert Sans"',
+              fontSize: '24px',
+              fontWeight: 500,
+              lineHeight: 'normal',
+            }}
+          >
+            Delivering premium multimedia, radio, and streaming<br />experiences tailored to local standards.
+          </p>
+        </div>
+
+        {/* Step 3: All Active */}
+        <div
+          className="absolute top-0 left-0 flex flex-col transition-all duration-700"
+          style={{
+            width: '608px',
+            opacity: step === 3 && isActive ? 1 : 0,
+            transform: step === 3 && isActive ? 'translateY(0)' : 'translateY(20px)',
+          }}
+        >
+         
+        </div>
+      </div>
     </div>
   );
 };

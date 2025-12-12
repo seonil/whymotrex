@@ -23,6 +23,9 @@ const InnovationScreen: React.FC<InnovationScreenProps> = ({ setPage, registerNe
     return 0;
   });
 
+  // For fade transition when going from last slide to first
+  const [isFading, setIsFading] = useState(false);
+
   // Keep ref to current slide for use in handlers
   const currentSlideRef = useRef(currentSlide);
   useEffect(() => {
@@ -34,10 +37,15 @@ const InnovationScreen: React.FC<InnovationScreenProps> = ({ setPage, registerNe
     localStorage.setItem(SLIDE_STORAGE_KEY, currentSlide.toString());
   }, [currentSlide]);
 
-  // Slide navigation functions
+  // Slide navigation functions (kept for potential button use)
   const nextSlide = () => {
     if (currentSlide >= 3) {
-      setPage(Page.Home);
+      // Fade transition to first slide
+      setIsFading(true);
+      setTimeout(() => {
+        setCurrentSlide(0);
+        setTimeout(() => setIsFading(false), 50);
+      }, 500);
     } else {
       setCurrentSlide((prev) => prev + 1);
     }
@@ -52,15 +60,19 @@ const InnovationScreen: React.FC<InnovationScreenProps> = ({ setPage, registerNe
   useEffect(() => {
     const handleNext = () => {
       if (currentSlideRef.current >= 3) {
-        // Last slide - go to home
-        setPage(Page.Home);
+        // Last slide - fade transition to first slide
+        setIsFading(true);
+        setTimeout(() => {
+          setCurrentSlide(0);
+          setTimeout(() => setIsFading(false), 50);
+        }, 500);
       } else {
         setCurrentSlide((prev) => prev + 1);
       }
     };
     registerNextAction(handleNext);
     return () => registerNextAction(null);
-  }, [registerNextAction, setPage]);
+  }, [registerNextAction]);
 
   // Register prev action handler
   useEffect(() => {
@@ -80,11 +92,11 @@ const InnovationScreen: React.FC<InnovationScreenProps> = ({ setPage, registerNe
         width: '1920px',
         height: '1080px',
         backgroundColor: '#F5F7FA',
-        fontFamily: "'Albert Sans', sans-serif",
+        fontFamily: "'42dot Sans', sans-serif",
       }}
     >
-      {/* Navigation Controls (Floating Bottom Right) */}
-      <div className="absolute bottom-12 right-16 flex gap-6 z-50">
+      {/* Navigation Controls (Floating Bottom Right) - HIDDEN */}
+      {/* <div className="absolute bottom-12 right-16 flex gap-6 z-50">
         <button
           onClick={prevSlide}
           className="w-14 h-14 rounded-full bg-white shadow-xl flex items-center justify-center hover:bg-gray-50 hover:scale-105 transition-all duration-300 border border-gray-100 opacity-80 hover:opacity-100"
@@ -99,10 +111,10 @@ const InnovationScreen: React.FC<InnovationScreenProps> = ({ setPage, registerNe
         >
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6" /></svg>
         </button>
-      </div>
+      </div> */}
 
-      {/* Pagination Indicators */}
-      <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 flex gap-4 z-50">
+      {/* Pagination Indicators - HIDDEN */}
+      {/* <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 flex gap-4 z-50">
         {[0, 1, 2, 3].map((idx) => (
           <button
             key={idx}
@@ -112,10 +124,10 @@ const InnovationScreen: React.FC<InnovationScreenProps> = ({ setPage, registerNe
             aria-label={`Go to slide ${idx + 1}`}
           />
         ))}
-      </div>
+      </div> */}
 
-      {/* Header (Back Button) */}
-      <div className="absolute top-0 left-0 p-10 z-50">
+      {/* Home Button (Top Right) */}
+      <div className="absolute z-50" style={{ top: '30px', right: '30px' }}>
         <button
           onClick={() => setPage(Page.Home)}
           className="flex items-center justify-center w-14 h-14 rounded-full bg-white shadow-md hover:shadow-lg transition-all opacity-80 hover:opacity-100 group"
@@ -128,10 +140,13 @@ const InnovationScreen: React.FC<InnovationScreenProps> = ({ setPage, registerNe
         </button>
       </div>
 
-      {/* Slides Viewport */}
+      {/* Slides Viewport with fade transition */}
       <div
-        className="flex transition-transform duration-700 ease-[cubic-bezier(0.25,0.1,0.25,1.0)] h-full"
-        style={{ transform: `translateX(-${currentSlide * 1920}px)` }}
+        className={`flex h-full transition-opacity duration-500 ease-in-out ${isFading ? 'opacity-0' : 'opacity-100'}`}
+        style={{
+          transform: `translateX(-${currentSlide * 1920}px)`,
+          transition: isFading ? 'opacity 0.5s ease-in-out' : 'transform 0.7s cubic-bezier(0.25,0.1,0.25,1.0), opacity 0.5s ease-in-out'
+        }}
       >
         <Slide0_Intro />
         <Slide1_RnD isActive={currentSlide === 1} />
@@ -204,7 +219,7 @@ const Slide0_Intro = () => {
         <p
           style={{
             color: '#FFF',
-            fontFamily: '"Albert Sans"',
+            fontFamily: '"42dot Sans"',
             fontSize: '40px',
             fontStyle: 'normal',
             fontWeight: 500,
@@ -219,7 +234,7 @@ const Slide0_Intro = () => {
         <h1
           style={{
             color: '#FFF',
-            fontFamily: '"Albert Sans"',
+            fontFamily: '"42dot Sans"',
             fontSize: '92px',
             fontStyle: 'normal',
             fontWeight: 700,
@@ -321,7 +336,7 @@ const Slide1_RnD: React.FC<Slide1_RnDProps> = ({ isActive }) => {
       </div>
 
       {/* Header Title */}
-      <div className="absolute top-[80px] left-[80px] z-20 flex items-start gap-12 w-[1760px]">
+      <div className="absolute top-[60px] left-[80px] z-20 flex items-start gap-28 w-[1760px]">
         <h1
           className="whitespace-nowrap"
           style={{
@@ -337,7 +352,7 @@ const Slide1_RnD: React.FC<Slide1_RnDProps> = ({ isActive }) => {
             transition: 'all 1s ease-out 0.2s',
           }}
         >
-          MOTREX R&D
+          MOTREX<br /> R&D
         </h1>
         <p
           style={{
@@ -376,10 +391,13 @@ const Slide1_RnD: React.FC<Slide1_RnDProps> = ({ isActive }) => {
                   lineHeight: '26px'
                 }}>01</span>
               </div>
-              <h3 className="mb-4" style={{ color: '#005FF9', fontFamily: '"42dot Sans"', fontSize: '32px', fontWeight: 800, lineHeight: 'normal' }}>
+              <h3 className="mb-4 flex items-start" style={{ color: '#005FF9', fontFamily: '"42dot Sans"', fontSize: '32px', fontWeight: 800, lineHeight: 'normal', marginLeft: '-15px' }}>
+                <svg width="32" height="35" viewBox="0 0 32 35" fill="none" style={{ marginRight: '8px', flexShrink: 0 }}>
+                  <path d="M8 20L13.8846 26L25 12" stroke="#005FF9" strokeWidth="3.5" strokeLinejoin="bevel" />
+                </svg>
                 In-house technology<br />& development
               </h3>
-              <ul className="space-y-2">
+              <ul className="space-y-2" style={{ marginLeft: '15px' }}>
                 <li className="flex items-start gap-3">
                   <span className="w-1.5 h-1.5 rounded-full bg-black shrink-0 mt-2.5" />
                   <span style={{ color: '#000', fontFamily: '"42dot Sans"', fontSize: '20px', fontWeight: 500, lineHeight: 'normal' }}>
@@ -400,30 +418,37 @@ const Slide1_RnD: React.FC<Slide1_RnDProps> = ({ isActive }) => {
           <div style={getWrapperStyle(1200)}>
             <div className="bg-white/90 p-8 rounded-3xl shadow-xl border border-gray-100/50 hover:scale-105 transition-transform duration-300">
               <div className="mb-6">
-                <h4 className="mb-3" style={{ color: '#005FF9', fontFamily: '"42dot Sans"', fontSize: '32px', fontWeight: 800, lineHeight: 'normal' }}>
+                <h4 className="mb-3 flex items-center" style={{ color: '#000', fontFamily: '"42dot Sans"', fontSize: '24px', fontStyle: 'normal', fontWeight: 700, lineHeight: 'normal', marginLeft: '-15px' }}>
+                  <span style={{ marginRight: '8px', display: 'flex', alignItems: 'center' }}>
+                    <svg width="28" height="32" viewBox="0 0 32 36" fill="none">
+                      <circle cx="15.5" cy="14.5" r="2.5" stroke="black" strokeWidth="2" />
+                      <path d="M24 14.4211C24 19.0719 19.75 25.7895 15.5 30C11.25 25.7895 7 19.0719 7 14.4211C7 9.77023 10.8056 6 15.5 6C20.1944 6 24 9.77023 24 14.4211Z" stroke="black" strokeWidth="2" strokeLinejoin="bevel" />
+                    </svg>
+                  </span>
                   Internal high-reliability technology
                 </h4>
-                <ul className="space-y-2">
+                <ul className="space-y-2" style={{ marginLeft: '15px' }}>
                   <li className="flex items-start gap-3">
                     <span className="w-1.5 h-1.5 rounded-full bg-black shrink-0 mt-2.5" />
                     <span style={{ color: '#000', fontFamily: '"42dot Sans"', fontSize: '20px', fontWeight: 500, lineHeight: 'normal' }}>
-                      HMI, display controller, AI, connectivity solutions
+                      SW, UI / UX / GUI, HW, Mechanism
                     </span>
                   </li>
-                  <li className="flex items-start gap-3">
-                    <span className="w-1.5 h-1.5 rounded-full bg-black shrink-0 mt-2.5" />
-                    <span style={{ color: '#000', fontFamily: '"42dot Sans"', fontSize: '20px', fontWeight: 500, lineHeight: 'normal' }}>
-                      End-to-end integration across AVN & Cluster
-                    </span>
-                  </li>
+
                 </ul>
               </div>
               <div className="h-px bg-gray-200 my-6"></div>
               <div>
-                <h4 className="mb-3" style={{ color: '#005FF9', fontFamily: '"42dot Sans"', fontSize: '32px', fontWeight: 800, lineHeight: 'normal' }}>
+                <h4 className="mb-3 flex items-center" style={{ color: '#000', fontFamily: '"42dot Sans"', fontSize: '24px', fontStyle: 'normal', fontWeight: 700, lineHeight: 'normal', marginLeft: '-15px' }}>
+                  <span style={{ marginRight: '8px', display: 'flex', alignItems: 'center' }}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="3" />
+                      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                    </svg>
+                  </span>
                   Agile development process
                 </h4>
-                <ul className="space-y-2">
+                <ul className="space-y-2" style={{ marginLeft: '15px' }}>
                   <li className="flex items-start gap-3">
                     <span className="w-1.5 h-1.5 rounded-full bg-black shrink-0 mt-2.5" />
                     <span style={{ color: '#000', fontFamily: '"42dot Sans"', fontSize: '20px', fontWeight: 500, lineHeight: 'normal' }}>
@@ -457,10 +482,13 @@ const Slide1_RnD: React.FC<Slide1_RnDProps> = ({ isActive }) => {
                   lineHeight: '26px'
                 }}>02</span>
               </div>
-              <h3 className="mb-4" style={{ color: '#005FF9', fontFamily: '"42dot Sans"', fontSize: '32px', fontWeight: 800, lineHeight: 'normal' }}>
+              <h3 className="mb-4 flex items-start" style={{ color: '#005FF9', fontFamily: '"42dot Sans"', fontSize: '32px', fontWeight: 800, lineHeight: 'normal', marginLeft: '-15px' }}>
+                <svg width="32" height="35" viewBox="0 0 32 35" fill="none" style={{ marginRight: '8px', flexShrink: 0 }}>
+                  <path d="M8 20L13.8846 26L25 12" stroke="#005FF9" strokeWidth="3.5" strokeLinejoin="bevel" />
+                </svg>
                 Platform development<br />based on requirements
               </h3>
-              <ul className="space-y-2">
+              <ul className="space-y-2" style={{ marginLeft: '15px' }}>
                 <li className="flex items-start gap-3">
                   <span className="w-1.5 h-1.5 rounded-full bg-black shrink-0 mt-2.5" />
                   <span style={{ color: '#000', fontFamily: '"42dot Sans"', fontSize: '20px', fontWeight: 500, lineHeight: 'normal' }}>
@@ -481,10 +509,16 @@ const Slide1_RnD: React.FC<Slide1_RnDProps> = ({ isActive }) => {
           <div style={getWrapperStyle(2100)}>
             <div className="bg-white/90 p-8 rounded-3xl shadow-xl border border-gray-100/50 hover:scale-105 transition-transform duration-300">
               <div className="mb-6">
-                <h4 className="mb-3" style={{ color: '#005FF9', fontFamily: '"42dot Sans"', fontSize: '32px', fontWeight: 800, lineHeight: 'normal' }}>
+                <h4 className="mb-3 flex items-center" style={{ color: '#000', fontFamily: '"42dot Sans"', fontSize: '24px', fontStyle: 'normal', fontWeight: 700, lineHeight: 'normal', marginLeft: '-15px' }}>
+                  <span style={{ marginRight: '8px', display: 'flex', alignItems: 'center' }}>
+                    <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                      <path d="M6.70968 8.8V6.4H9.80645M6.70968 8.8H4M6.70968 8.8V13.2M6.70968 13.2H4M6.70968 13.2V17.8M6.70968 17.8H4M6.70968 17.8V22.5M6.70968 22.5V25.6H25.2903V6.4H21.8065M6.70968 22.5H4M28 8.8H25.2903M28 13.2H25.2903M28 17.8H25.2903M28 22.5H25.2903M9.80645 6.4V4M9.80645 6.4H13.6774M13.6774 6.4V4M13.6774 6.4H17.5484M17.5484 6.4V4M17.5484 6.4H21.8065M21.8065 6.4V4M9.80645 28V25.6M13.6774 28V25.6M17.5484 28V25.6M21.8065 28V25.6" stroke="black" strokeWidth="2" strokeLinejoin="bevel" />
+                      <rect x="12" y="12" width="8" height="8" stroke="black" strokeWidth="2" strokeLinejoin="bevel" />
+                    </svg>
+                  </span>
                   Expertise in OS/AP/MCU
                 </h4>
-                <ul className="space-y-2">
+                <ul className="space-y-2" style={{ marginLeft: '15px' }}>
                   <li className="flex items-start gap-3">
                     <span className="w-1.5 h-1.5 rounded-full bg-black shrink-0 mt-2.5" />
                     <span style={{ color: '#000', fontFamily: '"42dot Sans"', fontSize: '20px', fontWeight: 500, lineHeight: 'normal' }}>
@@ -507,14 +541,21 @@ const Slide1_RnD: React.FC<Slide1_RnDProps> = ({ isActive }) => {
               </div>
               <div className="h-px bg-gray-200 my-6"></div>
               <div>
-                <h4 className="mb-3" style={{ color: '#005FF9', fontFamily: '"42dot Sans"', fontSize: '32px', fontWeight: 800, lineHeight: 'normal' }}>
+                <h4 className="mb-3 flex items-center" style={{ color: '#000', fontFamily: '"42dot Sans"', fontSize: '24px', fontStyle: 'normal', fontWeight: 700, lineHeight: 'normal', marginLeft: '-15px' }}>
+                  <span style={{ marginRight: '8px', display: 'flex', alignItems: 'center' }}>
+                    <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                      <rect x="4" y="8" width="24" height="17" stroke="black" strokeWidth="2" strokeLinejoin="bevel" />
+                      <path d="M8 16V12H12" stroke="black" strokeWidth="2" strokeLinejoin="bevel" />
+                      <path d="M24 17L24 21L20 21" stroke="black" strokeWidth="2" strokeLinejoin="bevel" />
+                    </svg>
+                  </span>
                   Comprehensive display solution
                 </h4>
-                <ul className="space-y-2">
+                <ul className="space-y-2" style={{ marginLeft: '15px' }}>
                   <li className="flex items-start gap-3">
                     <span className="w-1.5 h-1.5 rounded-full bg-black shrink-0 mt-2.5" />
                     <span style={{ color: '#000', fontFamily: '"42dot Sans"', fontSize: '20px', fontWeight: 500, lineHeight: 'normal' }}>
-                      Various display sizes and resolutions 6"~12.8
+                      Various display sizes and resolutions 7"~12.3"
                     </span>
                   </li>
                   <li className="flex items-start gap-3">
@@ -550,10 +591,13 @@ const Slide1_RnD: React.FC<Slide1_RnDProps> = ({ isActive }) => {
                   lineHeight: '26px'
                 }}>03</span>
               </div>
-              <h3 className="mb-4" style={{ color: '#005FF9', fontFamily: '"42dot Sans"', fontSize: '32px', fontWeight: 800, lineHeight: 'normal' }}>
+              <h3 className="mb-4 flex items-start" style={{ color: '#005FF9', fontFamily: '"42dot Sans"', fontSize: '32px', fontWeight: 800, lineHeight: 'normal', marginLeft: '-15px' }}>
+                <svg width="32" height="35" viewBox="0 0 32 35" fill="none" style={{ marginRight: '8px', flexShrink: 0 }}>
+                  <path d="M8 20L13.8846 26L25 12" stroke="#005FF9" strokeWidth="3.5" strokeLinejoin="bevel" />
+                </svg>
                 Global standards &<br />R&D investment
               </h3>
-              <ul className="space-y-2">
+              <ul className="space-y-2" style={{ marginLeft: '15px' }}>
                 <li className="flex items-start gap-3">
                   <span className="w-1.5 h-1.5 rounded-full bg-black shrink-0 mt-2.5" />
                   <span style={{ color: '#000', fontFamily: '"42dot Sans"', fontSize: '20px', fontWeight: 500, lineHeight: 'normal' }}>
@@ -574,10 +618,20 @@ const Slide1_RnD: React.FC<Slide1_RnDProps> = ({ isActive }) => {
           <div style={getWrapperStyle(3000)}>
             <div className="bg-white/90 p-8 rounded-3xl shadow-xl border border-gray-100/50 hover:scale-105 transition-transform duration-300">
               <div className="mb-6">
-                <h4 className="mb-3" style={{ color: '#005FF9', fontFamily: '"42dot Sans"', fontSize: '32px', fontWeight: 800, lineHeight: 'normal' }}>
+                <h4 className="mb-3 flex items-center" style={{ color: '#000', fontFamily: '"42dot Sans"', fontSize: '24px', fontStyle: 'normal', fontWeight: 700, lineHeight: 'normal', marginLeft: '-15px' }}>
+                  <span style={{ marginRight: '8px', display: 'flex', alignItems: 'center' }}>
+                    <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                      <path d="M19.7059 5L7 5L7 28L25 28L25 10.7917M19.7059 5L19.7059 10.7917L25 10.7917M19.7059 5L25 10.7917" stroke="black" strokeWidth="2" strokeLinejoin="bevel" />
+                      <path d="M10.5 19.5L13.5 16.5L16.5 20L21.5 14.5" stroke="black" strokeWidth="2" strokeLinejoin="bevel" />
+                      <circle cx="13.5" cy="15.5" r="1.5" fill="black" />
+                      <circle cx="21.5" cy="14.5" r="1.5" fill="black" />
+                      <circle cx="16.5" cy="20.5" r="1.5" fill="black" />
+                      <circle cx="10.5" cy="19.5" r="1.5" fill="black" />
+                    </svg>
+                  </span>
                   Global standard
                 </h4>
-                <ul className="space-y-2">
+                <ul className="space-y-2" style={{ marginLeft: '15px' }}>
                   <li className="flex items-start gap-3">
                     <span className="w-1.5 h-1.5 rounded-full bg-black shrink-0 mt-2.5" />
                     <span style={{ color: '#000', fontFamily: '"42dot Sans"', fontSize: '20px', fontWeight: 500, lineHeight: 'normal' }}>
@@ -594,10 +648,23 @@ const Slide1_RnD: React.FC<Slide1_RnDProps> = ({ isActive }) => {
               </div>
               <div className="h-px bg-gray-200 my-6"></div>
               <div>
-                <h4 className="mb-3" style={{ color: '#005FF9', fontFamily: '"42dot Sans"', fontSize: '32px', fontWeight: 800, lineHeight: 'normal' }}>
+                <h4 className="mb-3 flex items-center" style={{ color: '#000', fontFamily: '"42dot Sans"', fontSize: '24px', fontStyle: 'normal', fontWeight: 700, lineHeight: 'normal', marginLeft: '-15px' }}>
+                  <span style={{ marginRight: '8px', display: 'flex', alignItems: 'center' }}>
+                    <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                      <ellipse cx="21.5766" cy="16.7691" rx="6.34615" ry="2.30769" stroke="black" strokeWidth="2" />
+                      <path d="M27.9228 16.7693V20.0533C27.9228 21.4259 25.0815 22.5385 21.5766 22.5385C18.0717 22.5385 15.2305 21.4259 15.2305 20.0533V16.7693" stroke="black" strokeWidth="2" />
+                      <rect x="5" y="11.1538" width="12.6923" height="12.6923" fill="white" />
+                      <ellipse cx="11.3462" cy="12.3077" rx="6.34615" ry="2.30769" fill="white" stroke="black" strokeWidth="2" />
+                      <ellipse cx="11.3462" cy="12.3077" rx="6.34615" ry="2.30769" fill="white" stroke="black" strokeWidth="2" />
+                      <path d="M17.6923 12.3076V15.5916C17.6923 16.9642 14.851 18.0768 11.3462 18.0768C7.84127 18.0768 5 16.9642 5 15.5916V12.3076" stroke="black" strokeWidth="2" />
+                      <path d="M17.6923 12.3076V15.5916C17.6923 16.9642 14.851 18.0768 11.3462 18.0768C7.84127 18.0768 5 16.9642 5 15.5916V12.3076" stroke="black" strokeWidth="2" />
+                      <path d="M17.6923 15.7693V19.0533C17.6923 20.4259 14.851 21.5385 11.3462 21.5385C7.84127 21.5385 5 20.4259 5 19.0533V15.7693" stroke="black" strokeWidth="2" />
+                      <path d="M17.6923 19.2307V22.5147C17.6923 23.8873 14.851 24.9999 11.3462 24.9999C7.84127 24.9999 5 23.8873 5 22.5147V19.2307" stroke="black" strokeWidth="2" />
+                    </svg>
+                  </span>
                   Active R&D investment
                 </h4>
-                <ul className="space-y-2">
+                <ul className="space-y-2" style={{ marginLeft: '15px' }}>
                   <li className="flex items-start gap-3">
                     <span className="w-1.5 h-1.5 rounded-full bg-black shrink-0 mt-2.5" />
                     <span style={{ color: '#000', fontFamily: '"42dot Sans"', fontSize: '20px', fontWeight: 500, lineHeight: 'normal' }}>
@@ -622,7 +689,7 @@ const Slide1_RnD: React.FC<Slide1_RnDProps> = ({ isActive }) => {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 
@@ -676,7 +743,7 @@ const Slide2_CoreTech: React.FC<Slide2_CoreTechProps> = ({ isActive }) => {
       }}
     >
       {/* Header Title */}
-      <div className="absolute top-[80px] left-[80px] z-20 flex items-start gap-12 w-[1760px]">
+      <div className="absolute top-[60px] left-[80px] z-20 flex items-start gap-28 w-[1760px]">
         <h1
           className="whitespace-nowrap"
           style={{
@@ -689,7 +756,7 @@ const Slide2_CoreTech: React.FC<Slide2_CoreTechProps> = ({ isActive }) => {
             letterSpacing: '-0.96px',
           }}
         >
-          Core Technology
+          Core <br />Technology
         </h1>
         <p
           style={{
@@ -697,8 +764,8 @@ const Slide2_CoreTech: React.FC<Slide2_CoreTechProps> = ({ isActive }) => {
             fontFamily: '"42dot Sans", sans-serif',
             fontSize: '40px',
             fontStyle: 'normal',
-            fontWeight: 500,
             lineHeight: '120%',
+            fontWeight: 500,
             letterSpacing: '-0.8px',
           }}
         >

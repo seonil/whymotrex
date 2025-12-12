@@ -23,6 +23,9 @@ const UnifiedStrengthScreen: React.FC<UnifiedStrengthScreenProps> = ({ setPage, 
     return 0;
   });
 
+  // For fade transition when going from last slide to first
+  const [isFading, setIsFading] = useState(false);
+
   // Keep ref to current slide for use in handlers
   const currentSlideRef = useRef(currentSlide);
   useEffect(() => {
@@ -34,10 +37,15 @@ const UnifiedStrengthScreen: React.FC<UnifiedStrengthScreenProps> = ({ setPage, 
     localStorage.setItem(SLIDE_STORAGE_KEY, currentSlide.toString());
   }, [currentSlide]);
 
-  // Slide navigation functions
+  // Slide navigation functions (kept for potential button use)
   const nextSlide = () => {
-    if (currentSlide >= 1) {
-      setPage(Page.Home);
+    if (currentSlide >= 3) {
+      // Last slide - fade transition to first slide
+      setIsFading(true);
+      setTimeout(() => {
+        setCurrentSlide(0);
+        setTimeout(() => setIsFading(false), 50);
+      }, 500);
     } else {
       setCurrentSlide((prev) => prev + 1);
     }
@@ -51,16 +59,20 @@ const UnifiedStrengthScreen: React.FC<UnifiedStrengthScreenProps> = ({ setPage, 
   // Register next action handler
   useEffect(() => {
     const handleNext = () => {
-      if (currentSlideRef.current >= 1) {
-        // Last slide - go to home
-        setPage(Page.Home);
+      if (currentSlideRef.current >= 3) {
+        // Last slide - fade transition to first slide
+        setIsFading(true);
+        setTimeout(() => {
+          setCurrentSlide(0);
+          setTimeout(() => setIsFading(false), 50);
+        }, 500);
       } else {
         setCurrentSlide((prev) => prev + 1);
       }
     };
     registerNextAction(handleNext);
     return () => registerNextAction(null);
-  }, [registerNextAction, setPage]);
+  }, [registerNextAction]);
 
   // Register prev action handler
   useEffect(() => {
@@ -80,11 +92,11 @@ const UnifiedStrengthScreen: React.FC<UnifiedStrengthScreenProps> = ({ setPage, 
         width: '1920px',
         height: '1080px',
         backgroundColor: '#F5F9FF',
-        fontFamily: "'Albert Sans', sans-serif",
+        fontFamily: "'42dot Sans', sans-serif",
       }}
     >
-      {/* Navigation Controls (Floating Bottom Right) */}
-      <div className="absolute bottom-12 right-16 flex gap-6 z-50">
+      {/* Navigation Controls (Floating Bottom Right) - HIDDEN */}
+      {/* <div className="absolute bottom-12 right-16 flex gap-6 z-50">
         <button
           onClick={prevSlide}
           className="w-14 h-14 rounded-full bg-white shadow-xl flex items-center justify-center hover:bg-gray-50 hover:scale-105 transition-all duration-600 border border-gray-100 opacity-80 hover:opacity-100"
@@ -99,10 +111,10 @@ const UnifiedStrengthScreen: React.FC<UnifiedStrengthScreenProps> = ({ setPage, 
         >
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6" /></svg>
         </button>
-      </div>
+      </div> */}
 
-      {/* Pagination Indicators */}
-      <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 flex gap-4 z-50">
+      {/* Pagination Indicators - HIDDEN */}
+      {/* <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 flex gap-4 z-50">
         {[0, 1, 2, 3].map((idx) => (
           <button
             key={idx}
@@ -112,10 +124,10 @@ const UnifiedStrengthScreen: React.FC<UnifiedStrengthScreenProps> = ({ setPage, 
             aria-label={`Go to slide ${idx + 1}`}
           />
         ))}
-      </div>
+      </div> */}
 
-      {/* Header (Back to Home) */}
-      <div className="absolute top-0 left-0 p-10 z-50">
+      {/* Home Button (Top Right) */}
+      <div className="absolute z-50" style={{ top: '30px', right: '30px' }}>
         <button
           onClick={() => setPage(Page.Home)}
           className="flex items-center justify-center w-14 h-14 rounded-full bg-white shadow-md hover:shadow-lg transition-all opacity-80 hover:opacity-100 group"
@@ -128,10 +140,13 @@ const UnifiedStrengthScreen: React.FC<UnifiedStrengthScreenProps> = ({ setPage, 
         </button>
       </div>
 
-      {/* Slides Viewport */}
+      {/* Slides Viewport with fade transition */}
       <div
-        className="flex transition-transform duration-700 ease-[cubic-bezier(0.25,0.1,0.25,1.0)] h-full"
-        style={{ transform: `translateX(-${currentSlide * 1920}px)` }}
+        className={`flex h-full transition-opacity duration-500 ease-in-out ${isFading ? 'opacity-0' : 'opacity-100'}`}
+        style={{
+          transform: `translateX(-${currentSlide * 1920}px)`,
+          transition: isFading ? 'opacity 0.5s ease-in-out' : 'transform 0.7s cubic-bezier(0.25,0.1,0.25,1.0), opacity 0.5s ease-in-out'
+        }}
       >
         <Slide0_Intro />
         <Slide1_Affiliates isActive={currentSlide === 1} />
@@ -204,7 +219,7 @@ const Slide0_Intro = () => {
         <p
           style={{
             color: '#FFF',
-            fontFamily: '"Albert Sans"',
+            fontFamily: '"42dot Sans"',
             fontSize: '40px',
             fontStyle: 'normal',
             fontWeight: 500,
@@ -219,7 +234,7 @@ const Slide0_Intro = () => {
         <h1
           style={{
             color: '#FFF',
-            fontFamily: '"Albert Sans"',
+            fontFamily: '"42dot Sans"',
             fontSize: '92px',
             fontStyle: 'normal',
             fontWeight: 700,
@@ -275,7 +290,7 @@ const Slide1_Affiliates: React.FC<Slide1_AffiliatesProps> = ({ isActive }) => {
             fontSize: '64px',
             fontWeight: 700,
             letterSpacing: '-1px',
-            fontFamily: '"Albert Sans", sans-serif',
+            fontFamily: '"42dot Sans", sans-serif',
           }}
         >
           MOTREX Affiliates
@@ -289,7 +304,7 @@ const Slide1_Affiliates: React.FC<Slide1_AffiliatesProps> = ({ isActive }) => {
             maxWidth: '1200px',
             lineHeight: '1.6',
             marginTop: '-10px',
-            fontFamily: '"Albert Sans", sans-serif',
+            fontFamily: '"42dot Sans", sans-serif',
           }}
         >
           MOTREX advances mobility value through the synergy of our automotive affiliates.
@@ -358,29 +373,83 @@ const Slide1_Affiliates: React.FC<Slide1_AffiliatesProps> = ({ isActive }) => {
 
 // --- Slide 2: Group ---
 const Slide2_Group = () => {
+  // 육각형 데이터: 좌측 열 (DMS, SVM, Air Purifier), 우측 열 (e-Mirror, In-Cabin Health, Smart Carpet)
+  const hexagonData = [
+    { text: 'DMS', x: 188, y: 224 },           // 좌측 1행
+    { text: 'e-Mirror', x: 1450, y: 224 },     // 우측 1행
+    { text: 'SVM', x: 73, y: 446 },            // 좌측 2행
+    { text: 'In-Cabin Health', x: 1555, y: 446 }, // 우측 2행
+    { text: 'Air Purifier', x: 188, y: 672 },  // 좌측 3행
+    { text: 'Smart Carpet', x: 1450, y: 672 }, // 우측 3행
+  ];
+
+  // Hexagon component
+  const Hexagon = ({ text, x, y }: { text: string; x: number; y: number }) => (
+    <div
+      className="absolute flex items-center justify-center"
+      style={{
+        left: `${x}px`,
+        top: `${y}px`,
+        width: '280px',
+        height: '300px',
+      }}
+    >
+      <img
+        src={getAssetUrl('/images/star.svg')}
+        alt=""
+        style={{ width: '280px', height: '300px' }}
+      />
+      <span
+        className="absolute text-center"
+        style={{
+          color: '#005FF9',
+          fontFamily: '"42dot Sans"',
+          fontSize: '32px',
+          fontWeight: 800,
+          lineHeight: 'normal',
+          maxWidth: '200px',
+        }}
+      >
+        {text}
+      </span>
+    </div>
+  );
+
   return (
     <div
       className="relative w-[1920px] h-full flex-shrink-0"
       style={{
-        backgroundColor: '#F5F9FF',
+        backgroundImage: `url(${getAssetUrl('/images/bg-3-3.png')})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
       }}
     >
+      {/* Title */}
       <div
         className="absolute left-0 right-0 flex flex-col items-center"
         style={{ top: '56px' }}
       >
         <h1
-          className="text-center mb-6"
+          className="text-center"
           style={{
-            color: '#000000',
-            fontSize: '64px',
-            fontWeight: 700,
-            letterSpacing: '-1px',
+            color: '#000',
+            fontFamily: '"42dot Sans"',
+            fontSize: '48px',
+            fontStyle: 'normal',
+            fontWeight: 800,
+            lineHeight: '120%',
+            letterSpacing: '-0.96px',
           }}
         >
           Total In-Cabin Solution Partner, Motrex group
         </h1>
-        {/* No subtitle provided for this slide, keeping structure if needed */}
+      </div>
+
+      {/* Hexagons Container */}
+      <div className="absolute inset-0">
+        {hexagonData.map((item, index) => (
+          <Hexagon key={index} text={item.text} x={item.x} y={item.y} />
+        ))}
       </div>
     </div>
   );

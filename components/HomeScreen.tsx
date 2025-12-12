@@ -54,7 +54,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ setPage, registerNextAction, re
       <h1
         className="text-white text-center font-bold absolute"
         style={{
-          fontFamily: 'Albert Sans',
+          fontFamily: '"42dot Sans"',
           fontSize: '94px',
           fontWeight: 700,
           lineHeight: '103.4px',
@@ -71,7 +71,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ setPage, registerNextAction, re
       <p
         className="text-white text-center absolute"
         style={{
-          fontFamily: 'Albert Sans',
+          fontFamily: '"42dot Sans"',
           fontSize: '24px',
           top: '268px',
           left: '50%',
@@ -127,7 +127,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ setPage, registerNextAction, re
             <h2
               className="text-white text-center font-semibold"
               style={{
-                fontFamily: 'Albert Sans',
+                fontFamily: '"42dot Sans"',
                 fontSize: '36px',
                 fontWeight: 600,
                 lineHeight: '1.4',
@@ -153,7 +153,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ setPage, registerNextAction, re
       >
         <div
           className="text-white text-2xl font-semibold"
-          style={{ fontFamily: 'Albert Sans' }}
+          style={{ fontFamily: '"42dot Sans"' }}
         >
           MOTREX 2026
         </div>

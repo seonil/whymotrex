@@ -4,14 +4,71 @@
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   width: 100%;
   height: 100%;
   overflow: hidden;
 }
 
+@font-face {
+  font-family: 'Albert Sans';
+  src: url('/fonts/AlbertSans-VariableFont_wght.ttf') format('truetype-variations');
+  font-weight: 100 900;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Albert Sans';
+  src: url('/fonts/AlbertSans-Italic-VariableFont_wght.ttf') format('truetype-variations');
+  font-weight: 100 900;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: '42dot Sans';
+  src: url('/fonts/42dotSans-300.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: '42dot Sans';
+  src: url('/fonts/42dotSans-400.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: '42dot Sans';
+  src: url('/fonts/42dotSans-500.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: '42dot Sans';
+  src: url('/fonts/42dotSans-600.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: '42dot Sans';
+  src: url('/fonts/42dotSans-700.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: '42dot Sans';
+  src: url('/fonts/42dotSans-800.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+}
+
 body {
-  font-family: 'Albert Sans', sans-serif;
+  font-family: '42dot Sans', sans-serif;
   background-color: #0A0F1A;
 }
 
