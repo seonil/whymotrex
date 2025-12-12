@@ -1,14 +1,18 @@
 import React, { useEffect } from 'react';
 import { Page } from '../types';
 import { getAssetUrl } from '../utils';
+import { getSlideDuration } from '../config';
+
 
 interface HomeScreenProps {
   setPage: (page: Page) => void;
   registerNextAction: (handler: (() => void) | null) => void;
   registerPrevAction: (handler: (() => void) | null) => void;
+  setAutoRollDelay: (delay: number) => void;
 }
 
-const HomeScreen: React.FC<HomeScreenProps> = ({ setPage, registerNextAction, registerPrevAction }) => {
+const HomeScreen: React.FC<HomeScreenProps> = ({ setPage, registerNextAction, registerPrevAction, setAutoRollDelay }) => {
+
   const cards = [
     {
       title: 'Innovation Driven by Technology Leadership',
@@ -27,7 +31,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ setPage, registerNextAction, re
     },
   ];
 
+  // Set default duration for Home screen
+  useEffect(() => {
+    setAutoRollDelay(getSlideDuration(Page.Home));
+  }, [setAutoRollDelay]);
+
   // Disable all global actions on home screen - only button clicks work
+
   useEffect(() => {
     registerNextAction(null);
     return () => registerNextAction(null);

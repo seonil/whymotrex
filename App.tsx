@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { DEFAULT_DURATION, SHOW_PROGRESS_BAR } from './config';
+
 import HomeScreen from './components/HomeScreen';
 import InnovationScreen from './components/InnovationScreen';
 import QualityScreen from './components/QualityScreen';
@@ -20,6 +22,8 @@ function App() {
   const [scale, setScale] = useState(1);
   const nextActionRef = useRef<(() => void) | null>(null);
   const prevActionRef = useRef<(() => void) | null>(null);
+  const [autoRollDelay, setAutoRollDelay] = useState(DEFAULT_DURATION);
+  const progressBarRef = useRef<HTMLDivElement>(null);
 
   // Save page to localStorage whenever it changes
   useEffect(() => {
@@ -56,6 +60,8 @@ function App() {
 
   // Global "next/prev action" event listeners
   useEffect(() => {
+    let autoRollInterval: NodeJS.Timeout | null = null;
+
     const triggerNextAction = () => {
       if (nextActionRef.current) {
         nextActionRef.current();
@@ -68,9 +74,41 @@ function App() {
       }
     };
 
+    // Start Auto Rolling Logic
+    const startAutoRoll = () => {
+      if (autoRollInterval) clearInterval(autoRollInterval);
+
+      // Reset Progress Bar Animation
+      if (progressBarRef.current && SHOW_PROGRESS_BAR) {
+        const el = progressBarRef.current;
+        el.style.animation = 'none';
+        void el.offsetWidth; // Force Reflow
+        el.style.animation = `progress-linear ${autoRollDelay}ms linear infinite`;
+      }
+
+      autoRollInterval = setInterval(() => {
+        triggerNextAction();
+      }, autoRollDelay);
+    };
+
+    // Handle Manual Interaction (Reset Timer)
+    const handleManualInteraction = () => {
+      // Simply restart the auto-roll timer
+      // This clears the current interval and starts a new one with 'autoRollDelay'
+      startAutoRoll();
+    };
+
+    // Initialize auto-roll on mount/update
+    startAutoRoll();
+
     // Next action: Click, ArrowRight, ScrollDown, Enter, Space
     // Prev action: ArrowLeft, Backspace
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Reset timer on any meaningful key interaction
+      if (['Enter', 'ArrowRight', ' ', 'ArrowLeft', 'Backspace'].includes(e.key)) {
+        handleManualInteraction();
+      }
+
       if (e.key === 'Enter' || e.key === 'ArrowRight' || e.key === ' ') {
         e.preventDefault();
         triggerNextAction();
@@ -82,6 +120,9 @@ function App() {
 
     // Mouse click - next action (ignore clicks on buttons/interactive elements)
     const handleClick = (e: MouseEvent) => {
+      // Reset timer on any click
+      handleManualInteraction();
+
       const target = e.target as HTMLElement;
       if (
         target.tagName === 'BUTTON' ||
@@ -89,6 +130,7 @@ function App() {
         target.classList.contains('cursor-pointer') ||
         target.closest('.cursor-pointer')
       ) {
+        // Even if we don't trigger next action, we still reset the timer (already done above)
         return;
       }
       triggerNextAction();
@@ -96,6 +138,9 @@ function App() {
 
     // Mouse wheel scroll down (next)
     const handleWheel = (e: WheelEvent) => {
+      // Reset timer on scroll
+      handleManualInteraction();
+
       if (e.deltaY > 0) {
         e.preventDefault();
         triggerNextAction();
@@ -103,26 +148,67 @@ function App() {
       // Scroll up does nothing (prev is only ArrowLeft/Backspace)
     };
 
+    // Mouse move - reset timer
+    const handleMouseMove = () => {
+      handleManualInteraction();
+    };
+
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('click', handleClick);
     window.addEventListener('wheel', handleWheel, { passive: false });
+    window.addEventListener('mousemove', handleMouseMove);
 
     return () => {
+      if (autoRollInterval) clearInterval(autoRollInterval);
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('click', handleClick);
       window.removeEventListener('wheel', handleWheel);
+      window.removeEventListener('mousemove', handleMouseMove);
     };
-  }, []);
+  }, [autoRollDelay]); // Re-run when delay changes
+
 
   return (
     <div className="app-container">
-      <MouseTracker />
+      {/* <MouseTracker /> */}
+      <style>{`
+        @keyframes progress-linear {
+          0% { width: 0%; }
+          100% { width: 100%; }
+        }
+      `}</style>
+
+      {SHOW_PROGRESS_BAR && (
+        <div
+          style={{
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            width: '100%',
+            height: '4px',
+            backgroundColor: 'rgba(0,0,0,0.1)',
+            zIndex: 9999,
+            pointerEvents: 'none'
+          }}
+        >
+          <div
+            ref={progressBarRef}
+            style={{
+              height: '100%',
+              backgroundColor: '#005FF9',
+              width: '0%',
+              // Animation is set via JS
+            }}
+          />
+        </div>
+      )}
+
       <div className="content-wrapper">
         <div className="canvas" style={{ transform: `scale(${scale})` }}>
-          {page === Page.Home && <HomeScreen setPage={setPage} registerNextAction={registerNextAction} registerPrevAction={registerPrevAction} />}
-          {page === Page.Innovation && <InnovationScreen setPage={setPage} registerNextAction={registerNextAction} registerPrevAction={registerPrevAction} />}
-          {page === Page.Quality && <QualityScreen setPage={setPage} registerNextAction={registerNextAction} registerPrevAction={registerPrevAction} />}
-          {page === Page.UnifiedStrength && <UnifiedStrengthScreen setPage={setPage} registerNextAction={registerNextAction} registerPrevAction={registerPrevAction} />}
+          {page === Page.Home && <HomeScreen setPage={setPage} registerNextAction={registerNextAction} registerPrevAction={registerPrevAction} setAutoRollDelay={setAutoRollDelay} />}
+          {page === Page.Innovation && <InnovationScreen setPage={setPage} registerNextAction={registerNextAction} registerPrevAction={registerPrevAction} setAutoRollDelay={setAutoRollDelay} />}
+          {page === Page.Quality && <QualityScreen setPage={setPage} registerNextAction={registerNextAction} registerPrevAction={registerPrevAction} setAutoRollDelay={setAutoRollDelay} />}
+          {page === Page.UnifiedStrength && <UnifiedStrengthScreen setPage={setPage} registerNextAction={registerNextAction} registerPrevAction={registerPrevAction} setAutoRollDelay={setAutoRollDelay} />}
         </div>
       </div>
     </div>
@@ -130,3 +216,4 @@ function App() {
 }
 
 export default App;
+

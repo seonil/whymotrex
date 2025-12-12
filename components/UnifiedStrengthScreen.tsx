@@ -1,16 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Page } from '../types';
 import { getAssetUrl } from '../utils';
+import { getSlideDuration } from '../config';
 
 interface UnifiedStrengthScreenProps {
   setPage: (page: Page) => void;
   registerNextAction: (handler: (() => void) | null) => void;
   registerPrevAction: (handler: (() => void) | null) => void;
+  setAutoRollDelay: (delay: number) => void;
 }
 
 const SLIDE_STORAGE_KEY = 'whymotrex-unified-slide';
 
-const UnifiedStrengthScreen: React.FC<UnifiedStrengthScreenProps> = ({ setPage, registerNextAction, registerPrevAction }) => {
+const UnifiedStrengthScreen: React.FC<UnifiedStrengthScreenProps> = ({ setPage, registerNextAction, registerPrevAction, setAutoRollDelay }) => {
   // Initialize slide from localStorage
   const [currentSlide, setCurrentSlide] = useState(() => {
     const saved = localStorage.getItem(SLIDE_STORAGE_KEY);
@@ -36,6 +38,11 @@ const UnifiedStrengthScreen: React.FC<UnifiedStrengthScreenProps> = ({ setPage, 
   useEffect(() => {
     localStorage.setItem(SLIDE_STORAGE_KEY, currentSlide.toString());
   }, [currentSlide]);
+
+  // Update auto roll delay
+  useEffect(() => {
+    setAutoRollDelay(getSlideDuration(Page.UnifiedStrength, currentSlide));
+  }, [currentSlide, setAutoRollDelay]);
 
   // Slide navigation functions (kept for potential button use)
   const nextSlide = () => {
@@ -375,23 +382,25 @@ const Slide1_Affiliates: React.FC<Slide1_AffiliatesProps> = ({ isActive }) => {
 const Slide2_Group = () => {
   // 육각형 데이터: 좌측 열 (DMS, SVM, Air Purifier), 우측 열 (e-Mirror, In-Cabin Health, Smart Carpet)
   const hexagonData = [
-    { text: 'DMS', x: 188, y: 224 },           // 좌측 1행
-    { text: 'e-Mirror', x: 1450, y: 224 },     // 우측 1행
-    { text: 'SVM', x: 73, y: 446 },            // 좌측 2행
-    { text: 'In-Cabin Health', x: 1555, y: 446 }, // 우측 2행
-    { text: 'Air Purifier', x: 188, y: 672 },  // 좌측 3행
-    { text: 'Smart Carpet', x: 1450, y: 672 }, // 우측 3행
+    { text: 'DMS', x: 188, y: 224, delay: 0 },           // 좌측 1행
+    { text: 'e-Mirror', x: 1450, y: 224, delay: 120 },   // 우측 1행
+    { text: 'SVM', x: 73, y: 446, delay: 240 },          // 좌측 2행
+    { text: 'In-Cabin Health', x: 1555, y: 446, delay: 360 }, // 우측 2행
+    { text: 'Air Purifier', x: 188, y: 672, delay: 480 }, // 좌측 3행
+    { text: 'Smart Carpet', x: 1450, y: 672, delay: 600 }, // 우측 3행
   ];
 
   // Hexagon component
-  const Hexagon = ({ text, x, y }: { text: string; x: number; y: number }) => (
+  const Hexagon = ({ text, x, y, delay }: { text: string; x: number; y: number; delay: number }) => (
     <div
-      className="absolute flex items-center justify-center"
+      className="absolute flex items-center justify-center opacity-0"
       style={{
         left: `${x}px`,
         top: `${y}px`,
         width: '280px',
         height: '300px',
+        animation: 'hex-fade-in 800ms ease-out forwards',
+        animationDelay: `${delay}ms`,
       }}
     >
       <img
@@ -408,6 +417,9 @@ const Slide2_Group = () => {
           fontWeight: 800,
           lineHeight: 'normal',
           maxWidth: '200px',
+          top: '47%',
+          left: '48%',
+          transform: 'translate(-50%, -50%)',
         }}
       >
         {text}
@@ -445,11 +457,51 @@ const Slide2_Group = () => {
         </h1>
       </div>
 
+      {/* Hexagon appearance animation */}
+      <style>{`
+        @keyframes hex-fade-in {
+          0% {
+            opacity: 0;
+            transform: translateY(24px) scale(0.96);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+      `}</style>
+
       {/* Hexagons Container */}
       <div className="absolute inset-0">
         {hexagonData.map((item, index) => (
-          <Hexagon key={index} text={item.text} x={item.x} y={item.y} />
+          <Hexagon key={index} text={item.text} x={item.x} y={item.y} delay={item.delay} />
         ))}
+        {/* Air Purifier connector line */}
+        <svg
+          className="absolute inset-0 pointer-events-none"
+          width="1920"
+          height="1080"
+          viewBox="0 0 1920 1080"
+        >
+          <polyline
+            points="323,930 323,1005 832,1005"
+            fill="none"
+            stroke="#ffffff"
+            strokeWidth="5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <polyline
+            points="1597,930 1597,1005 1088,1005"
+            fill="none"
+            stroke="#ffffff"
+            strokeWidth="5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <circle cx="834" cy="1004" r="7.5" fill="#ffffff" />
+          <circle cx="1087" cy="1003" r="7.5" fill="#ffffff" />
+        </svg>
       </div>
     </div>
   );
@@ -459,11 +511,21 @@ const Slide2_Group = () => {
 const Slide3_Placeholder = () => {
   return (
     <div
-      className="relative w-[1920px] h-full flex-shrink-0"
+      className="relative w-[1920px] h-full flex-shrink-0 flex items-center justify-center"
       style={{
         backgroundColor: '#F5F9FF',
       }}
     >
+      <h1
+        style={{
+          fontFamily: '"42dot Sans"',
+          fontSize: '60px',
+          fontWeight: 700,
+          color: '#005FF9',
+        }}
+      >
+        JUNJIN 영상 삽입 예정
+      </h1>
     </div>
   );
 };

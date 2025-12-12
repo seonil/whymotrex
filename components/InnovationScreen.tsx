@@ -1,16 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Page } from '../types';
 import { getAssetUrl } from '../utils';
+import { getSlideDuration } from '../config';
+
 
 interface InnovationScreenProps {
   setPage: (page: Page) => void;
   registerNextAction: (handler: (() => void) | null) => void;
   registerPrevAction: (handler: (() => void) | null) => void;
+  setAutoRollDelay: (delay: number) => void;
 }
+
 
 const SLIDE_STORAGE_KEY = 'whymotrex-innovation-slide';
 
-const InnovationScreen: React.FC<InnovationScreenProps> = ({ setPage, registerNextAction, registerPrevAction }) => {
+const InnovationScreen: React.FC<InnovationScreenProps> = ({ setPage, registerNextAction, registerPrevAction, setAutoRollDelay }) => {
+
   // Initialize slide from localStorage
   const [currentSlide, setCurrentSlide] = useState(() => {
     const saved = localStorage.getItem(SLIDE_STORAGE_KEY);
@@ -36,6 +41,12 @@ const InnovationScreen: React.FC<InnovationScreenProps> = ({ setPage, registerNe
   useEffect(() => {
     localStorage.setItem(SLIDE_STORAGE_KEY, currentSlide.toString());
   }, [currentSlide]);
+
+  // Update auto roll delay
+  useEffect(() => {
+    setAutoRollDelay(getSlideDuration(Page.Innovation, currentSlide));
+  }, [currentSlide, setAutoRollDelay]);
+
 
   // Slide navigation functions (kept for potential button use)
   const nextSlide = () => {
@@ -925,7 +936,7 @@ const Slide2_CoreTech: React.FC<Slide2_CoreTechProps> = ({ isActive }) => {
             <li className="flex items-start gap-3">
               <span className={bulletStyle} />
               <span style={itemStyle}>
-                Wireless connectivity (BLE, Wifi, LTE), know-how in global RF parameters
+                Wireless connectivity (BLE, Wi-Fi, LTE), know-how in global RF parameters
               </span>
             </li>
           </ul>
