@@ -250,7 +250,7 @@ const Slide0_Intro = () => {
             textShadow: '0 4px 10px rgba(0,0,0,0.3)',
           }}
         >
-          Unified Strength <br />for Future Mobility
+          Integrated Solution <br />for Future Mobility
         </h1>
       </div>
     </div>

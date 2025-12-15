@@ -25,7 +25,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ setPage, registerNextAction, re
       bgImage: getAssetUrl('/images/bg-2-1.png')
     },
     {
-      title: 'Unified Strength for Future Mobility',
+      title: 'Integrated Solution for Future Mobility',
       page: Page.UnifiedStrength,
       bgImage: getAssetUrl('/images/bg-3-1.png')
     },
