@@ -16,7 +16,8 @@
       "Bash(git commit:*)",
       "Bash(git branch:*)",
       "Bash(git push:*)",
-      "Bash(powershell -Command:*)"
+      "Bash(powershell -Command:*)",
+      "Bash(npm run desktop:dist:*)"
     ],
     "deny": [],
     "ask": []
