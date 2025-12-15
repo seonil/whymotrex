@@ -815,7 +815,7 @@ const Slide3: React.FC<Slide3Props> = ({ isActive }) => {
               letterSpacing: '-1px',
             }}
           >
-            Scalable Architecure for Mutli Vehicle Integration
+            Scalable Architecure for Various Vehicle Types
           </h1>
         </div>
         <div className={getAnimStyle('delay-[500ms]')}>
