@@ -850,7 +850,7 @@ const Slide2_CoreTech: React.FC<Slide2_CoreTechProps> = ({ isActive }) => {
             <li className="flex items-start gap-3">
               <span className={bulletStyle} />
               <span style={itemStyle}>
-                Power-Saving mode via STR (Suspend to Ram), 3 sec boot-up
+                Power-Saving mode via STR (Suspend to RAM), 3 sec boot-up
               </span>
             </li>
           </ul>
