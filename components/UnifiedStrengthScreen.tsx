@@ -18,7 +18,7 @@ const UnifiedStrengthScreen: React.FC<UnifiedStrengthScreenProps> = ({ setPage, 
     const saved = localStorage.getItem(SLIDE_STORAGE_KEY);
     if (saved) {
       const num = parseInt(saved, 10);
-      if (!isNaN(num) && num >= 0 && num < 4) {
+      if (!isNaN(num) && num >= 0 && num < 5) {
         return num;
       }
     }
@@ -44,15 +44,21 @@ const UnifiedStrengthScreen: React.FC<UnifiedStrengthScreenProps> = ({ setPage, 
     setAutoRollDelay(getSlideDuration(Page.UnifiedStrength, currentSlide));
   }, [currentSlide, setAutoRollDelay]);
 
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  const goToFirstSlide = () => {
+    setIsFading(true);
+    setTimeout(() => {
+      setCurrentSlide(0);
+      setTimeout(() => setIsFading(false), 50);
+    }, 500);
+  };
+
   // Slide navigation functions (kept for potential button use)
   const nextSlide = () => {
-    if (currentSlide >= 3) {
+    if (currentSlide >= 4) {
       // Last slide - fade transition to first slide
-      setIsFading(true);
-      setTimeout(() => {
-        setCurrentSlide(0);
-        setTimeout(() => setIsFading(false), 50);
-      }, 500);
+      goToFirstSlide();
     } else {
       setCurrentSlide((prev) => prev + 1);
     }
@@ -66,13 +72,9 @@ const UnifiedStrengthScreen: React.FC<UnifiedStrengthScreenProps> = ({ setPage, 
   // Register next action handler
   useEffect(() => {
     const handleNext = () => {
-      if (currentSlideRef.current >= 3) {
+      if (currentSlideRef.current >= 4) {
         // Last slide - fade transition to first slide
-        setIsFading(true);
-        setTimeout(() => {
-          setCurrentSlide(0);
-          setTimeout(() => setIsFading(false), 50);
-        }, 500);
+        goToFirstSlide();
       } else {
         setCurrentSlide((prev) => prev + 1);
       }
@@ -91,6 +93,20 @@ const UnifiedStrengthScreen: React.FC<UnifiedStrengthScreenProps> = ({ setPage, 
     registerPrevAction(handlePrev);
     return () => registerPrevAction(null);
   }, [registerPrevAction]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) {
+      return;
+    }
+    if (currentSlide === 4) {
+      video.currentTime = 0;
+      void video.play();
+    } else {
+      video.pause();
+      video.currentTime = 0;
+    }
+  }, [currentSlide]);
 
   return (
     <div
@@ -158,7 +174,8 @@ const UnifiedStrengthScreen: React.FC<UnifiedStrengthScreenProps> = ({ setPage, 
         <Slide0_Intro />
         <Slide1_Affiliates isActive={currentSlide === 1} />
         <Slide2_Group />
-        <Slide3_Placeholder />
+        <Slide3_Product isActive={currentSlide === 3} />
+        <Slide4_Video videoRef={videoRef} onEnded={goToFirstSlide} />
       </div>
     </div>
   );
@@ -507,25 +524,116 @@ const Slide2_Group = () => {
   );
 };
 
-// --- Slide 3: Placeholder ---
-const Slide3_Placeholder = () => {
+// --- Slide 3: Product Placeholder (Copy of Innovation Slide 3 structure) ---
+interface Slide3_ProductProps {
+  isActive: boolean;
+}
+
+const Slide3_Product: React.FC<Slide3_ProductProps> = ({ isActive }) => {
+  const getAnimStyle = (delay: string, type: 'fade' | 'slideLeft' | 'slideRight' | 'slideUp') => {
+    const baseStyle = "transition-all duration-1000 ease-out";
+    let transformStyle = "";
+
+    if (type === 'fade') {
+      transformStyle = isActive ? "opacity-100" : "opacity-0";
+    } else if (type === 'slideLeft') {
+      transformStyle = isActive ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-32";
+    } else if (type === 'slideRight') {
+      transformStyle = isActive ? "opacity-100 translate-x-0" : "opacity-0 translate-x-32";
+    } else if (type === 'slideUp') {
+      transformStyle = isActive ? "opacity-100 translate-y-0" : "opacity-0 translate-y-16";
+    }
+
+    return `${baseStyle} ${transformStyle} ${delay}`;
+  };
+
+  const titleStyle = {
+    color: '#2D2D30',
+    fontFamily: '"42dot Sans"',
+    fontSize: '40px',
+    fontStyle: 'normal',
+    fontWeight: 800,
+    lineHeight: '120%',
+    letterSpacing: '-0.8px',
+    marginBottom: '24px',
+  };
+
+  const descStyle = {
+    color: '#2D2D30',
+    fontFamily: '"42dot Sans"',
+    fontSize: '30px',
+    fontStyle: 'normal',
+    fontWeight: 500,
+    lineHeight: '120%',
+    letterSpacing: '-0.6px',
+    whiteSpace: 'pre-line',
+  };
+
+  const labelStyle = {
+    color: '#2D2D30',
+    fontFamily: '"42dot Sans"',
+    fontSize: '28px',
+    fontStyle: 'normal',
+    fontWeight: 400,
+    lineHeight: '120%',
+    letterSpacing: '-0.56px',
+    opacity: 0.4,
+  };
+
   return (
-    <div
-      className="relative w-[1920px] h-full flex-shrink-0 flex items-center justify-center"
-      style={{
-        backgroundColor: '#F5F9FF',
-      }}
-    >
-      <h1
-        style={{
-          fontFamily: '"42dot Sans"',
-          fontSize: '60px',
-          fontWeight: 700,
-          color: '#005FF9',
-        }}
-      >
-        JUNJIN 영상 삽입 예정
-      </h1>
+    <div className="relative w-[1920px] h-full flex-shrink-0 bg-[#F5F9FF] flex flex-col font-['42dot_Sans']">
+
+
+      {/* Row 1 */}
+      <div className="flex-1 flex items-center w-full">
+        <div className={`flex-shrink-0 ${getAnimStyle('delay-[300ms]', 'slideLeft')}`}>
+          <img src={getAssetUrl('/images/product4.png')} alt="Product 4" className="block h-[600px] w-auto mt-[50px]" />
+        </div>
+        <div className={`flex-1 pl-20 pr-24 -mt-[50px] flex flex-col items-start text-left ${getAnimStyle('delay-[500ms]', 'slideUp')}`}>
+          <h2 style={titleStyle}>AC Home Charger</h2>
+          <p style={descStyle}>
+            <strong>Up to 22 kW AC</strong> for home/light commercial installs with 110/220V input.<br />
+            <strong>Type 1/Type 2/NACS</strong> plus <strong>app/cloud control</strong> with load balancing and OTA updates.<br />
+            <strong>IP54 protection</strong> and <strong>CE/ARAI certifications</strong> for real-world use.
+          </p>
+        </div>
+      </div>
+
+      {/* Row 2 */}
+      <div className="flex-1 flex items-center w-full justify-end">
+        <div className={`flex-1 pl-2 pr-24 max-w-[980px] flex flex-col items-end text-right ${getAnimStyle('delay-[700ms]', 'slideUp')}`}>
+          <h2 style={titleStyle}>Portable Charger</h2>
+          <p style={descStyle}>
+            <strong>Up to 3.5 kW</strong> with a wide <strong>183-277 Vac</strong> input range.<br />
+            <strong>Type 1/Type 2/NACS</strong>, <strong>5 m cable</strong>, and <strong>3-step current</strong> selection.<br />
+            <strong>Temperature sensor</strong>, auto derating, and <strong>IEC 62752</strong> compliance.
+          </p>
+        </div>
+        <div className={`flex-shrink-0 -mt-[30px] ${getAnimStyle('delay-[900ms]', 'slideRight')}`}>
+          <img src={getAssetUrl('/images/product5.png')} alt="Product 5" className="block h-[500px] w-auto" />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// --- Slide 4: JUNJIN Solution Video ---
+interface Slide4_VideoProps {
+  videoRef: React.RefObject<HTMLVideoElement>;
+  onEnded: () => void;
+}
+
+const Slide4_Video: React.FC<Slide4_VideoProps> = ({ videoRef, onEnded }) => {
+  return (
+    <div className="relative w-[1920px] h-full flex-shrink-0 bg-black">
+      <video
+        ref={videoRef}
+        className="w-full h-full object-cover"
+        src={getAssetUrl('/video/JUNJIN-solution.mp4')}
+        onEnded={onEnded}
+        muted
+        playsInline
+      />
     </div>
   );
 };

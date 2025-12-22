@@ -5,6 +5,9 @@ node_modules/
 dist/
 release/
 
+# Media assets not committed
+public/video/
+
 # IDE
 .vscode/
 .idea/

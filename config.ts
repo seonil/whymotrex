@@ -39,7 +39,8 @@ export const SLIDE_DURATIONS: Record<string, number> = {
     [`${Page.UnifiedStrength}-0`]: 10000, // Intro
     [`${Page.UnifiedStrength}-1`]: 15000, // Affiliates
     [`${Page.UnifiedStrength}-2`]: 15000, // Group
-    [`${Page.UnifiedStrength}-3`]: 15000, // Placeholder
+    [`${Page.UnifiedStrength}-3`]: 15000, // Product
+    [`${Page.UnifiedStrength}-4`]: 600000, // Video (auto-advance via onEnded)
 };
 
 export const getSlideDuration = (page: Page, slideIndex?: number, stepIndex?: number): number => {
